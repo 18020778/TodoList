@@ -1,0 +1,58 @@
+{% extends 'index.html' %}
+{% block title %} Edit data {% endblock %}
+{% block content %}
+<div class="row">
+<div class="col-6" style="margin: 0 auto; margin-top: 20px">
+    <h4>Edit eachtodo</h4>
+    <form action="/update/{{id}}">
+        <div class="form-group">
+            <label for="title">Todo Title</label>
+            <input type="text" class="form-control" name="title" id="title" value={{title}}>
+        </div>
+        <div class="form-group">
+            <label for="description">Todo Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{description}}</textarea>
+        </div>
+        </br>
+        <div class="row">
+            <div style="width: fit-content; margin-top: 5px">Choose priority: </div>  
+            <select class="form-select form-control" id="priority" name="priority" >
+                {% if priority == "0-CHOOSE" %}
+                    <option hidden selected>0-CHOOSE</option>
+                {% else %} 
+                    <option hidden >0-CHOOSE</option>
+                {% endif %}
+                
+                {% if priority == '1-Important' %}
+                    <option selected>1-Important</option>
+                {% else %} 
+                     <option>1-Important</option>
+                {% endif %}
+
+                {% if priority == '2-High' %}
+                    <option selected>2-High</option>
+                {% else %} 
+                     <option>2-High</option>
+                {% endif %}
+
+                {% if priority == '3-Medium' %}
+                    <option selected>3-Medium</option>
+                {% else %} 
+                     <option>3-Medium</option>
+                {% endif %}
+
+                {% if priority == '4-Low' %}
+                    <option selected>4-Low</option>
+                {% else %} 
+                     <option>4-Low</option>
+                {% endif %}
+            </select>        
+        </div>
+        </br>
+        <button class="btn btn-success" type="submit" style="width: 50%; margin-left: 25%">
+            Update
+        </button>
+    </form>
+    </div>
+</div>
+{% endblock %}

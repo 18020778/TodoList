@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <title>{% block title %}{% endblock %}</title>
+    <style>
+        .option_btn {
+            position: relative;
+            left: -5px;
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .list_btn {
+            margin: 3px;
+            padding: 5px 10px 5px 10px;
+
+        }
+
+        .form-select {
+            width: 50%;
+            font-size: 17px;
+            width: 145px;
+            border: 1px solid #CCC;
+            height: 39px;
+        }
+    
+        option {
+            background: white;
+            color: black;
+        }
+        
+        .card-title span[data-status = "1-Important"] {
+            color: #b50000;
+        }
+
+        .card-title span[data-status = "2-High"] {
+            color: red;
+        }
+        
+        .card-title span[data-status = "3-Medium"] {
+            color: #cfcf00;
+        }
+        
+        .card-title span[data-status = "4-Low"] {
+            color: #69d113;
+        }
+        
+    </style>
+</head>
+
+<body>
+{% block content %}
+    <div class="container" style="margin-top: 20px">
+
+        <div class="row justify-content-around" style="margin: 0px auto">
+            <div class="col-4">
+                <h4>Add todo List</h4>
+                <form action="{% url 'add_todo' %}" >
+                    <div class="form-group">
+                        <label for="title">Todo Title</label>
+                        <input type="text" class="form-control" name="title" id="title">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Todo Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    </br>
+                    <div class="row">
+                        <div style="width: fit-content; margin-top: 5px">Choose priority: </div>  
+                        <select class="form-select form-control" id="priority" name="priority">
+                            <option hidden>0-CHOOSE</option>
+                            <option>1-Important</option>
+                            <option>2-High</option>
+                            <option>3-Medium</option>
+                            <option>4-Low</option>
+                        </select>        
+                    </div>
+                    </br>
+                    <button class="btn btn-success" id="AddToList" type="submit" style="width: 50%; margin-left: 25%" >
+                        Add to List
+                    </button>
+                    {% include 'message.html' %}
+                </form>
+            </div>
+
+            <div class="col"></div>
+            <div class="col-7">
+                <form action="{% url 'searchData'%}">
+                    <h4>Search By Title</h4>
+                    <div class="input-group">
+                        <input type="search" class="form-control" name="query" id="query">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit">
+                                Search
+                            </button>
+                        </span>
+                    </div>
+                </form>
+                </br>
+                </br>
+                <div class="row justify-content-between">
+                    <div class="col-7">
+                        <h4>List All Todo</h4>
+                    </div>
+                    
+                    <div class="col-3"> 
+                        <form action="{% url 'sortData' %}" >
+                            <button class="btn btn-success" type="submit" >
+                                Sort By Priority
+                            </button>
+                        </form>
+                    </div> 
+                    <div class="col-2 col-sm-auto"> 
+                        <form action="{% url 'index' %}" >
+                            <button class="btn btn-success" type="submit" >
+                                List All
+                            </button>
+                        </form>
+                    </div> 
+                </div>
+
+                {% for eachtodo in alltodos %}
+                <div class="card container-fluid" style="margin-top: 1rem;">
+                    <div class="card-body">
+                        <div class="col-10" style="position: relative; display: inline-grid">
+                            <h5 class="card-title">{{eachtodo.ItemName}} -- <span data-status="{{eachtodo.Priority}}">{{eachtodo.Priority}} <span></h5>
+                            <p >{{eachtodo.Description}}</p>
+                            <p >{{eachtodo.CreatedAtTime}}</p>
+                        </div>
+                        <div class="col-1" style="position: relative; display: inline-grid;">
+                            <div style="padding-top: 15px;"></div>
+                            <form>
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                                <button class="btn btn-danger list_btn" onclick="delete_item({{eachtodo.id}})">Delete</button>
+                            </form>
+                            <a href="/edit/{{eachtodo.id}}" class="btn btn-warning list_btn">Edit</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endblock content %}
+            </div>
+        </div>
+    </div>
+
+
+    <script >
+        $(document).ready(function() {
+            $('#priority').change(function() {
+                var current = $('#priority').val();
+                if (current == "1-Important") {
+                    $('#priority').css('background-color','#b50000')
+                    $('#priority').css('color','white')
+                    $('#priority').css('background-image','url(https://www.freeiconspng.com/thumbs/white-arrow-png/white-down-arrow-png-2.png)')
+                }
+                else if (current == "2-High") {
+                    $('#priority').css('background-color','red')
+                    $('#priority').css('color','white')
+                    $('#priority').css('background-image','url(https://www.freeiconspng.com/thumbs/white-arrow-png/white-down-arrow-png-2.png)')
+                }
+                else if (current == "3-Medium") {
+                    $('#priority').css('background-color','#cfcf00')
+                    $('#priority').css('background-image','url(https://www.freeiconspng.com/thumbs/white-arrow-png/white-down-arrow-png-2.png)')
+                }
+                else if (current == "4-Low") {
+                    $('#priority').css('background-color','#69d113')
+                    $('#priority').css('background-image','url(https://www.freeiconspng.com/thumbs/white-arrow-png/white-down-arrow-png-2.png)')
+                }
+            });
+
+            
+            
+        }); 
+        async function delete_item (id) {
+                var result = await confirm("Do you want to delete?")
+                if(!result) return
+                else {
+                    var urls = "{% url 'delete' %}"
+                    $.ajax({
+                        type:"POST", //post data
+                        data:{'id': id, "csrfmiddlewaretoken" : "{{csrf_token}}"}, //if you want to send any data to view 
+                        url: urls, // your url that u write in action in form tag
+                        success: function() {
+                            console.log("success")
+                        },
+                        error: function() {
+                            console.log("error_post")
+                        }
+                    }) 
+                }
+
+            } 
+    </script>
+
+
+</body>
+
+
+</html>
+
+ {% comment %} <div class="dropdown" style="position: relative; display: inline-block;">
+                            <button class="btn btn-primary dropdown-toggle" type="button" id="priority" data-toggle="dropdown">
+                                    Options
+                            <span class="caret"></span></button>
+                            <ul class="dropdown-menu" aria-labelledby="menu">
+                                <li><button class="btn" id="important"><span class="option_btn" style="background: #b50000;"><i
+                                                class="fas fa-flag"></i></span>Important</button></li>
+                                <li><button class="btn" id="high"><span class="option_btn" style="background: red; "><i
+                                                class="fas fa-flag"></i></span>High</button></li>
+                                <li><button class="btn" id="medium"><span class="option_btn" style="background: #dde002; "><i
+                                                class="fas fa-flag"></i></span>Medium</button></li>
+                                <li><button class="btn" id="low"><span class="option_btn" style="background: green;"><i
+                                                class="fas fa-flag"></i></span>Low</button></li>
+                            </ul>
+                        </div>  {% endcomment %}
